@@ -5,7 +5,7 @@ import java.util.List;
 
 public class CircuitNode {//接点クラス
 	private Integer ID=null;
-	private double current=0;//
+	private double current=0;//a
 	private double voltage=0;
 	private List<Element> elements=new ArrayList<Element>();
 
