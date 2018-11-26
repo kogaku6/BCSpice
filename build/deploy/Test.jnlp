@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="Test.jnlp">
+  <information>
+    <title>Test</title>
+    <vendor>vender name</vendor>
+    <description>BCSpice</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="Test.jar" size="727136" download="eager" />
+    <jar href="libs\Test-preloader.jar" size="1322" download="eager" />
+  </resources>
+  <jfx:javafx-desc  width="0" height="0" main-class="application.Main"  name="BCSpice"  preloader-class=""/>
+  <update check="background"/>
+</jnlp>
