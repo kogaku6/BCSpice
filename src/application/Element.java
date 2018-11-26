@@ -7,7 +7,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.scene.Group;
 import javafx.scene.input.MouseDragEvent;
 
-public abstract class Element {
+public abstract class Element {//素子クラス
 	private Integer ID=null;
 	private List<Integer> prevIDs=new ArrayList<Integer>();
 	private List<Integer> nextIDs=new ArrayList<Integer>();
