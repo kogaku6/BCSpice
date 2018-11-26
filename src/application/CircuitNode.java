@@ -13,7 +13,7 @@ public class CircuitNode {//接点クラス
 	//http://ednjapan.com/edn/articles/1306/04/news005.html
 
 	CircuitNode(){
-
+		System.out.println("gittest");//
 	}
 
 	public void add(Element element) {
