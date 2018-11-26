@@ -6,7 +6,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-public class FirstPreloader extends Preloader {
+public class FirstPreloader extends Preloader {//今のところ意味はない
 
     ProgressBar bar;
     Stage stage;

@@ -3,7 +3,7 @@ package application;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ElementsGroup {
+public class ElementsGroup {//今のところ意味はない
 	private Integer groupID=null;
 	private Integer nextGroupID=null;
 	private int grouptype=0;//0:直列 1:並列
