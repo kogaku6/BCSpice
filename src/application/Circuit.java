@@ -5,15 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.effect.Effect;
-import javafx.scene.paint.Color;
-
 public class Circuit {
+	public static Map<Integer, CircuitNode> circuitIDs=new HashMap<Integer, CircuitNode>();
 	public static Map<Integer, Element> elementIDs =new HashMap<Integer, Element>();
 	public static Map<Integer, List<Element>> groupIDs =new HashMap<Integer, List<Element>>();
-	public static SimpleObjectProperty<Color> color=new SimpleObjectProperty<Color>();
-	public static SimpleObjectProperty<Effect> effect=new SimpleObjectProperty<Effect>();
+	
+	public static int[][] field= new int[30][30];
+	
+	public static boolean isSimulating=false;
+//	public static Integer chosingNode=null;
+//	public static SimpleObjectProperty<Color> color=new SimpleObjectProperty<Color>();
+//	public static SimpleObjectProperty<Effect> effect=new SimpleObjectProperty<Effect>();
 
 	public static int getMinID() {
 		int num=0;

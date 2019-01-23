@@ -19,12 +19,12 @@ public class ElementsGroup {//今のところ意味はない
 
 	public double getImpedance() {
 		double value=0;
-		if(this.grouptype==0) {
-			value=elements.stream().map(key->Circuit.elementIDs.get(key)).filter(e->e.getImpedance()!=null).mapToDouble(e->e.getImpedance()).sum();
-		}
-		else {
-			value=(1/elements.stream().map(key->Circuit.elementIDs.get(key)).filter(e->e.getImpedance()!=null).mapToDouble(e->e.getImpedance()).map(v->(1/v)).sum());
-		}
+//		if(this.grouptype==0) {
+//			value=elements.stream().map(key->Circuit.elementIDs.get(key)).filter(e->e.getImpedance()!=null).mapToDouble(e->e.getImpedance()).sum();
+//		}
+//		else {
+//			value=(1/elements.stream().map(key->Circuit.elementIDs.get(key)).filter(e->e.getImpedance()!=null).mapToDouble(e->e.getImpedance()).map(v->(1/v)).sum());
+//		}
 		return value;
 	}
 	public Integer getGroupID() {

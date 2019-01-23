@@ -46,7 +46,7 @@ public class Matrix2D {
 		return new Matrix2D(t);
 	}
 
-	private void changeValue(int row, int col, double a){
+	private void setValue(int row, int col, double a){
 		this.matrix[row][col] = a;
 	}
 
@@ -206,13 +206,13 @@ public class Matrix2D {
 		for(int r=0; r<a.getCol(); r++){
 			double A = 1.0 / d.getValue(r, r);
 			for(int c=0; c<d.getCol(); c++){
-				d.changeValue(r, c, A*d.getValue(r, c));
+				d.setValue(r, c, A*d.getValue(r, c));
 			}
 
 			for(int i=r+1; i<a.getRow(); i++){
 				double B = d.getValue(i, r);
 				for(int c=0; c<d.getCol(); c++){
-					d.changeValue(i, c, d.getValue(i, c)-B*d.getValue(r, c));
+					d.setValue(i, c, d.getValue(i, c)-B*d.getValue(r, c));
 				}
 			}
 		}
@@ -221,7 +221,7 @@ public class Matrix2D {
 			for(int i=r+1; i<a.getCol(); i++){
 				double B = d.getValue(r, i);
 				for(int j=i; j<d.getCol(); j++){
-					d.changeValue(r, j, d.getValue(r, j) - B*d.getValue(i, j));
+					d.setValue(r, j, d.getValue(r, j) - B*d.getValue(i, j));
 				}
 			}
 		}

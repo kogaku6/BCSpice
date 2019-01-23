@@ -22,7 +22,7 @@ import javafx.stage.WindowEvent;
 
 public class Main extends Application {
 	public static Stage stage;
-	private static AnchorPane root;
+	public static AnchorPane root;
 	private static int px=640,py=480;
 
 	public static void main(String[] args) {
@@ -72,7 +72,7 @@ public class Main extends Application {
 
 	private void sendTitleController(String labelText){
 		try {
-			root = (AnchorPane)FXMLLoader.load(getClass().getResource("Title.fxml"));
+			root=(AnchorPane)FXMLLoader.load(getClass().getResource("Title.fxml"));
 			root.setStyle("-fx-font-family:'Meiryo'");
 			Scene top=new Scene(root, px, py);
 			top.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
@@ -91,8 +91,8 @@ public class Main extends Application {
 		return img;
 	}
 
+	//ウィンドウを閉じる際にメッセージ表示
 	private void abortClosing(WindowEvent we) {
-		//ウィンドウを閉じる際にメッセージ表示
 		Alert al=new Alert(AlertType.CONFIRMATION);
 		al.setHeaderText(null);
 		al.setContentText("おわるよ");
@@ -106,7 +106,4 @@ public class Main extends Application {
 		}
 	}
 
-	public static Stage createWindow() {
-		return new Stage();
-	}
 }
