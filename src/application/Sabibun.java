@@ -12,7 +12,4 @@ public static void Deff(double a double b double c) {
        double diff[t] = (f1(t+h,frec) - f1(t))/h;
        System.out.println("t("+t+") : h("+h+") : diff = " +diff+"); //計算テスト用に答え表示
   }
-  
-  
-  
 }
