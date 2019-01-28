@@ -13,6 +13,6 @@ public static void Deff(double a double b double c) {
        System.out.println("t("+t+") : h("+h+") : diff = " +diff+"); //計算テスト用に答え表示
   }
   
-  //キャパシタの計算(微分)
+  
   
 }
