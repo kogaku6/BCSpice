@@ -14,7 +14,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
@@ -28,6 +27,9 @@ public class Resistor extends Element{
 	Resistor(double X, double Y){
 		setX(X);
 		setY(Y);
+		
+		setName("Resistor");
+		
 		label.textProperty().bind(resistance.asString());
 		label.layoutXProperty().bind(label.widthProperty().divide(2));
 		label.setTextFill(Color.WHITE);
@@ -52,14 +54,15 @@ public class Resistor extends Element{
 		wires.add(1, new Line(rectangle.getWidth(), rectangle.getHeight()/2, rectangle.getWidth()+20, rectangle.getHeight()/2));
 		wires.get(1).setStrokeWidth(4);
 		
-		circles=new ArrayList<Circle>(2);
+		circles=new ArrayList<CircuitNode>(2);
 		for(int i=0; i<2; i++) {
-			circles.add(i, new Circle(0, 0, 5));
+			circles.add(i, new CircuitNode(0, 0, 5));
 			circles.get(i).layoutXProperty().bind(wires.get(i).endXProperty());
 			circles.get(i).layoutYProperty().bind(wires.get(i).endYProperty());
 			circles.get(i).setFill(Color.ALICEBLUE);
 		}
 		group.getChildren().addAll(wires.get(0), wires.get(1), rectangle, label, circles.get(0), circles.get(1));
+		setDraggable();
 	}
 
 	public void setResistance(double resistance) {

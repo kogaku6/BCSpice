@@ -5,24 +5,27 @@ import java.util.List;
 
 import javafx.scene.shape.Circle;
 
-public class CircuitNode {//接点クラス
-	private double X=0.0;
-	private double Y=0.0;
+public class CircuitNode extends Circle{//接点クラス
 	private Integer ID=null;//節点のID
+	private Integer elementID=null;
 	//private double current=0;//節点電流
 	//private double voltage=0;//節点電圧
 	private List<Element> elements=new ArrayList<Element>();//節点につながっている素子のIDのリスト
-	private Circle en=new Circle();
+	private String elementtype=null;
 
 	//http://www.ecircuitcenter.com/SpiceTopics/Overview/Overview.htm
 	//http://ednjapan.com/edn/articles/1306/04/news005.html
 
-	CircuitNode(double X, double Y){
-		en.setLayoutX(X);
-		en.setLayoutX(Y);
-	}
-	CircuitNode(){
-		this(0.0, 0.0);
+//	CircuitNode(double X, double Y){
+//		en.setLayoutX(X);
+//		en.setLayoutX(Y);
+//	}
+//	CircuitNode(){
+//		this(0.0, 0.0);
+//	}
+
+	public CircuitNode(int i, int j, int k) {
+		super(i, j, k);
 	}
 
 	//節点に素子をつなげる
@@ -60,24 +63,25 @@ public class CircuitNode {//接点クラス
 		return ID;
 	}
 
-	public void setID(Integer iD) {
-		ID = iD;
+	public void setID(Integer ID) {
+		this.ID = ID;
 	}
 
-	public double getX() {
-		return X;
+	public String getElementtype() {
+		return elementtype;
 	}
 
-	public void setX(double x) {
-		X = x;
+	public void setElementtype(String elementtype) {
+		this.elementtype = elementtype;
 	}
 
-	public double getY() {
-		return Y;
+	public Integer getElementID() {
+		return elementID;
 	}
 
-	public void setY(double y) {
-		Y = y;
+	public void setElementID(Integer elementID) {
+		this.elementID = elementID;
 	}
+
 
 }

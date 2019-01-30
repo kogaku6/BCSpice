@@ -6,7 +6,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 
 public class Voltage extends Element{
@@ -22,6 +21,9 @@ public class Voltage extends Element{
 	Voltage(double X, double Y){
 		setX(X);
 		setY(Y);
+		
+		setName("Voltage");
+		
 //		circle.setFill(Color.SANDYBROWN);
 		Line line1=new Line(0, 0, 0, 40);
 		line1.setStrokeWidth(4);
@@ -37,15 +39,16 @@ public class Voltage extends Element{
 		wires.add(1, new Line(line2.getStartX(), 20, line2.getStartX()+20, 20));
 		wires.get(1).setStrokeWidth(4);
 		
-		circles=new ArrayList<Circle>(2);
+		circles=new ArrayList<CircuitNode>(2);
 		for(int i=0; i<2; i++) {
-			circles.add(i, new Circle(0, 0, 5));
+			circles.add(i, new CircuitNode(0, 0, 5));
 			circles.get(i).layoutXProperty().bind(wires.get(i).endXProperty());
 			circles.get(i).layoutYProperty().bind(wires.get(i).endYProperty());
 			circles.get(i).setFill(Color.ALICEBLUE);
 		}
 		
 		group.getChildren().addAll(wires.get(0), wires.get(1), line1, line2, label, circles.get(0), circles.get(1));
+		setDraggable();
 	}
 
 	@Override

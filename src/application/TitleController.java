@@ -161,7 +161,7 @@ public class TitleController extends Application implements Initializable{
 		if(saveFile!=null) {
 			WritableImage snapshot =Main.stage.getScene().snapshot(null);
 	  		try {
-				ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png",saveFile);
+				ImageIO.write(SwingFXUtils.fromFXImage(snapshot, null), "png", saveFile);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -199,7 +199,9 @@ public class TitleController extends Application implements Initializable{
 		Button button=new Button();
 		button.setText("OK");
 		button.setOnMouseClicked(event->{
-
+			for(int i=0; i<Circuit.nodeIDs.size(); i++) {
+				System.out.println(Circuit.nodeIDs.get(i).getID()+":"+Circuit.nodeIDs.get(i).getElementtype());
+			}
 		});
 		pane.getChildren().addAll(button);
 		stage.setScene(scene);
