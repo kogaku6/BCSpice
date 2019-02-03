@@ -15,8 +15,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
@@ -88,12 +86,10 @@ public class TitleController extends Application implements Initializable{
 			ap.getChildren().addAll(vt.getGroup(),rs1.getGroup(),rs2.getGroup());//小ウィンドウに抵抗を置く
 		});
 		eraseItem.setOnAction(e->{
-			List<Node> list=new ArrayList<Node>();
-			ap.getChildren().stream().filter(node->node.getClass()==Group.class).forEach(node->{
-				list.add(node);
-			});
-			list.forEach(node->{
-				ap.getChildren().remove(node);
+			Circuit.elementIDs.forEach((a,b)->{
+				b.remove();
+				System.out.println("groupをけすよ");
+				ap.getChildren().remove(b.getGroup());
 			});
 		});
 		Menu edit=new Menu("Edit", null, editResistor, editWire, editSpecial);
@@ -186,7 +182,7 @@ public class TitleController extends Application implements Initializable{
 
 //		ap.setCursor(new ImageCursor(readImage("resources/icon.png")));
 //		Circuit.isSimulating=true;
-		//新しいウィンドウの生成
+		//テスト用ウィンドウの生成
 		Stage stage=new Stage();
 		stage.initOwner(Main.stage);
 		stage.initModality(Modality.APPLICATION_MODAL);//閉じるまで他の操作を禁止
@@ -198,7 +194,7 @@ public class TitleController extends Application implements Initializable{
 
 		Button button=new Button();
 		button.setText("OK");
-		button.setOnMouseClicked(event->{
+		button.setOnMouseClicked(event->{//ボタンクリック時のイベント
 			for(int i=0; i<Circuit.nodeIDs.size(); i++) {
 				System.out.println(Circuit.nodeIDs.get(i).getID()+":"+Circuit.nodeIDs.get(i).getElementtype());
 			}

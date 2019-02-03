@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 public class Circuit {
-	public static List<CircuitNode> nodeIDs=new ArrayList<CircuitNode>();
-	public static List<Element> elementIDs =new ArrayList<Element>();
+	public static Map<Integer, CircuitNode> nodeIDs=new HashMap<Integer, CircuitNode>();
+	public static Map<Integer, Element> elementIDs =new HashMap<Integer, Element>();
 	public static Map<Integer, List<Element>> groupIDs =new HashMap<Integer, List<Element>>();
-	
-	public static int[][] field= new int[30][30];
-	
+
+//	public static int[][] field= new int[30][30];
+
 	public static boolean isSimulating=false;
 //	public static Integer chosingNode=null;
 //	public static SimpleObjectProperty<Color> color=new SimpleObjectProperty<Color>();
@@ -21,7 +21,7 @@ public class Circuit {
 	public static int getMinElementID() {
 		int num=0;
 		if(!elementIDs.isEmpty()) {
-			for(num=1; num<elementIDs.size(); num++) {
+			for(; num<elementIDs.size(); num++) {
 				if(elementIDs.get(num)==null) {
 					break;
 				}
@@ -29,7 +29,7 @@ public class Circuit {
 		}
 		return num;
 	}
-	
+
 	//nodeIDsの空いている番号で最小のものを取得
 	public static int getMinNodeID() {
 		int num=0;
@@ -42,42 +42,67 @@ public class Circuit {
 		}
 		return num;
 	}
-	
+
 	//elementIDsの空いている最小の番号にelementを割り振る
 	public static void addElement(Element el) {
 		el.setID(getMinElementID());
-		elementIDs.add(getMinElementID(), el);
+		elementIDs.put(getMinElementID(), el);
 	}
-	
+
+	//elementIDsのnum番目の要素を消去する
+	public static void removeElement(int num) {
+		System.out.println(num+"番目のelementを消すよ");
+		elementIDs.remove(num);
+		System.out.println("elementIDsのsize:"+elementIDs.size());
+	}
+
 	//nodeIDsの空いている最小の番号にCircuitNodeを割り振る
-	public static void addNode(CircuitNode cn, String type) {
+	public static void addNode(CircuitNode cn, Element element) {
 		System.out.println("minID:"+getMinNodeID());
 		cn.setID(getMinNodeID());
-		nodeIDs.add(getMinNodeID(), cn);
-		cn.setElementtype(type);
+		cn.setElementID(element.getID());
+		nodeIDs.put(getMinNodeID(), cn);
+		cn.setElementtype(element.getName());
 	}
-	
+
+	//nodeIDsのnum番目の要素を消去する
+	public static void removeNode(int num) {
+		System.out.println(num+"番目のnodeを消すよ");
+		nodeIDs.remove(num);
+		System.out.println("nodeIDsのsize:"+nodeIDs.size());
+	}
+
 	//接点が重なっているか判定
 	public static void isIntersectNodes(int ID) {
+
 		CircuitNode node1=nodeIDs.get(ID);
 		for(int i=0; i<nodeIDs.size(); i++) {
 			if(ID!=i) {
 				CircuitNode node2=nodeIDs.get(i);
-//				double x1=element.getGroup().getLayoutX()+node1.getLayoutX();
-				
-				double distance=Math.sqrt(Math.pow(node1.getLayoutX()-node2.getLayoutX(), 2)+Math.pow(node1.getLayoutY()-node2.getLayoutY(), 2));
-				System.out.println(ID+":"+node1.getLayoutX()+", "+node1.getLayoutY()+i+":"+node2.getLayoutX()+", "+node2.getLayoutY());
-				System.out.println(ID+"と"+i+":"+distance);
-				if(distance<3) {
-					System.out.println(nodeIDs.get(i).getID()+"番目と重なってるよ");
+
+				double x1=elementIDs.get(node1.getElementID()).getGroup().getLayoutX()+node1.getLayoutX();
+				double y1=elementIDs.get(node1.getElementID()).getGroup().getLayoutY()+node1.getLayoutY();
+				double x2=elementIDs.get(node2.getElementID()).getGroup().getLayoutX()+node2.getLayoutX();
+				double y2=elementIDs.get(node2.getElementID()).getGroup().getLayoutY()+node2.getLayoutY();
+
+				double distance=Math.sqrt(Math.pow(x1-x2, 2)+Math.pow(y1-y2, 2));
+//				System.out.println(ID+":"+node1.getLayoutX()+", "+node1.getLayoutY()+i+":"+node2.getLayoutX()+", "+node2.getLayoutY());
+//				System.out.println(ID+"と"+i+":"+distance);
+				if(distance<20) {
+					System.out.println("node"+node2.getID()+"と重なっているよ");
+					node1.setIntersectNode(node2.getID());
+				}
+				else {
+					node1.setIntersectNode(null);
 				}
 			}
 		}
+
 	}
 
-	//keyに対応したElementを取得
+	//keyとElementを設定
 	public static void putElement(Integer key, Element element) {
-		if(groupIDs.get(key)!=null) {
+		if(elementIDs.get(key)!=null) {
 
 		}
 		else {

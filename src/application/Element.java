@@ -21,14 +21,6 @@ public abstract class Element {//素子クラス
 	protected List<CircuitNode> circles;
 
 	Element(){//暗黙的スーパーコンストラクタの定義 子クラスのコンストラクタの呼び出しの前に呼ばれる
-		this(0.0, 0.0);
-	}
-
-	Element(double X, double Y){
-//		this.ID=Circuit.getMinElementID();
-		Circuit.putElement(this.ID, this);
-		this.setX(X);
-		this.setY(Y);
 	}
 
 	public boolean isConnected(int num) {
@@ -44,6 +36,9 @@ public abstract class Element {//素子クラス
 
 	//GUI上で素子をドラッグできるようにする
 	protected void setDraggable() {
+		Circuit.addElement(this);
+		System.out.println(getName()+", "+getID());
+		
 		group.getChildren().stream().filter(node->node.getClass()!=CircuitNode.class).forEach(a->{
 			a.setOnMouseEntered(e->{
 				Glow glow=new Glow();
@@ -51,10 +46,10 @@ public abstract class Element {//素子クラス
 				group.setEffect(glow);
 				Main.root.setCursor(Cursor.HAND);
 			});
-			a.setOnMouseReleased(e->{
+			a.setOnMouseExited(e->{
 				group.setEffect(null);
 				Main.root.setCursor(Cursor.DEFAULT);
-			});			
+			});
 			a.setOnMousePressed(e->{
 				offsetX=e.getX();
 				offsetY=e.getY();
@@ -62,10 +57,19 @@ public abstract class Element {//素子クラス
 			a.addEventHandler(MouseDragEvent.MOUSE_DRAGGED, e->{
 				group.layoutXProperty().set(e.getSceneX()-offsetX);
 				group.layoutYProperty().set(e.getSceneY()-offsetY);
-//				e.consume();	
+//				e.consume();
 			});
 		});
-		circles.forEach(a->Circuit.addNode(a, name));
+		circles.forEach(a->Circuit.addNode(a, this));
+	}
+
+	public void remove() {
+		System.out.println(getID()+","+getName()+"だよ");
+		System.out.println("circleをけすよ");
+		circles.forEach(circle->{
+			Circuit.removeNode(circle.getID());
+		});
+//		Circuit.removeElement(getID());
 	}
 
 	public double getX() {

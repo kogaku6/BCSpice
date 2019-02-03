@@ -10,6 +10,7 @@ public class CircuitNode extends Circle{//接点クラス
 	private Integer elementID=null;
 	//private double current=0;//節点電流
 	//private double voltage=0;//節点電圧
+	private Integer intersectNode=null;
 	private List<Element> elements=new ArrayList<Element>();//節点につながっている素子のIDのリスト
 	private String elementtype=null;
 
@@ -81,6 +82,23 @@ public class CircuitNode extends Circle{//接点クラス
 
 	public void setElementID(Integer elementID) {
 		this.elementID = elementID;
+	}
+
+	public Integer getIntersectNode() {
+		return intersectNode;
+	}
+
+	public void setIntersectNode(Integer intersectNode) {
+		this.intersectNode = intersectNode;
+		if(intersectNode!=null) {
+			CircuitNode node=Circuit.nodeIDs.get(intersectNode);
+			double x1=Circuit.elementIDs.get(node.getElementID()).getGroup().getLayoutX();
+			double y1=Circuit.elementIDs.get(node.getElementID()).getGroup().getLayoutY();
+			double x2=Circuit.elementIDs.get(this.getElementID()).getGroup().getLayoutX();
+			double y2=Circuit.elementIDs.get(this.getElementID()).getGroup().getLayoutY();
+			this.setLayoutX(x1-x2+node.getLayoutX());
+			this.setLayoutY(y1-y2+node.getLayoutY());
+		}
 	}
 
 

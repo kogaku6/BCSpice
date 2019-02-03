@@ -8,17 +8,16 @@ import javafx.scene.input.MouseDragEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
-public class Wire extends Element{
+public class Wire extends Element{	
 	Wire(){
 		this(50, 0);
 	}
-	
+
 	Wire(double X, double Y){
 		setX(X);
 		setY(Y);
-		
 		setName("Wire");
-		
+
 		circles=new ArrayList<CircuitNode>(2);
 		circles.add(0,new CircuitNode(0, 0, 5));
 		circles.get(0).setFill(Color.ALICEBLUE);
@@ -47,10 +46,10 @@ public class Wire extends Element{
 				a.layoutXProperty().set(e.getSceneX()-offsetX);
 				a.layoutYProperty().set(e.getSceneY()-offsetY);
 				Circuit.isIntersectNodes(a.getID());
-//				e.consume();	
+//				e.consume();
 			});
 		});
-		
+
 		wires=new ArrayList<Line>(1);
 		Line line=new Line();
 		line.setStrokeWidth(4);
@@ -59,7 +58,7 @@ public class Wire extends Element{
 		line.endXProperty().bind(circles.get(1).layoutXProperty());
 		line.endYProperty().bind(circles.get(1).layoutYProperty());
 		wires.add(line);
-		
+
 		group.getChildren().addAll(wires.get(0), circles.get(0), circles.get(1));
 		setDraggable();
 	}
@@ -67,7 +66,7 @@ public class Wire extends Element{
 //		//https://teratail.com/questions/97911
 	//使う予定なし
 	Wire(Element prev, Element next){
-		
+
 	}
 
 
