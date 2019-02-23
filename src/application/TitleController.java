@@ -21,6 +21,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -68,15 +69,27 @@ public class TitleController extends Application implements Initializable{
 		closeItem.setAccelerator(new KeyCodeCombination(KeyCode.ESCAPE));//ESCでウィンドウを閉じる
 		//contextmenuの設定
 		ContextMenu contextMenu=new ContextMenu();
-		MenuItem editResistor=new MenuItem("Resistor");
 		MenuItem editWire=new MenuItem("Wire");
+		MenuItem editResistor=new MenuItem("Resistor");
+		MenuItem editCapacitor=new MenuItem("Capacitor");
+		MenuItem editInductor=new MenuItem("Inductor");
+		MenuItem editVoltage=new MenuItem("Voltage");
 		MenuItem editSpecial=new MenuItem("Preset");
 		MenuItem eraseItem=new MenuItem("Erase All");
-		editResistor.setOnAction(e->{
+		editWire.setOnAction(e->{//ワイヤーの生成
+			ap.getChildren().add(new Wire(contextMenu.getX()-Main.stage.getX(), contextMenu.getY()-Main.stage.getY()).getGroup());
+		});
+		editResistor.setOnAction(e->{//抵抗の生成
 			ap.getChildren().add(new Resistor(contextMenu.getX()-Main.stage.getX(), contextMenu.getY()-Main.stage.getY()).getGroup());
 		});
-		editWire.setOnAction(e->{
-			ap.getChildren().add(new Wire(contextMenu.getX()-Main.stage.getX(), contextMenu.getY()-Main.stage.getY()).getGroup());
+		editCapacitor.setOnAction(e->{//キャパシタの生成
+			ap.getChildren().add(new Capacitor(contextMenu.getX()-Main.stage.getX(), contextMenu.getY()-Main.stage.getY()).getGroup());
+		});
+		editInductor.setOnAction(e->{//インダクタの生成
+			ap.getChildren().add(new Inductor(contextMenu.getX()-Main.stage.getX(), contextMenu.getY()-Main.stage.getY()).getGroup());
+		});
+		editVoltage.setOnAction(e->{//電源の生成
+			ap.getChildren().add(new Voltage(contextMenu.getX()-Main.stage.getX(), contextMenu.getY()-Main.stage.getY()).getGroup());
 		});
 		editSpecial.setOnAction(e->{
 			//フィールドに素子を生成(テスト用)
@@ -92,7 +105,7 @@ public class TitleController extends Application implements Initializable{
 				ap.getChildren().remove(b.getGroup());
 			});
 		});
-		Menu edit=new Menu("Edit", null, editResistor, editWire, editSpecial);
+		Menu edit=new Menu("Edit", null, editWire, editResistor, editCapacitor, editInductor, editVoltage, new SeparatorMenuItem(), editSpecial);
 		Menu erase=new Menu("Erase", null, eraseItem);
 		contextMenu.getItems().addAll(edit, erase);
 		top.setOnMouseDragged(e->{

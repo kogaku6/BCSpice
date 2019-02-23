@@ -15,35 +15,34 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class Resistor extends Element{
-	private DoubleProperty resistance=new SimpleDoubleProperty(30.0);
-	private Rectangle rectangle=new Rectangle(0,0,100,30);
+public class Capacitor extends Element{
+	private DoubleProperty capacitance=new SimpleDoubleProperty(0.00001);
 	private Label label=new Label();
 
-	Resistor(double X, double Y){
+	Capacitor(double X, double Y){
 		setX(X);
 		setY(Y);
-		
-		setName("Resistor");
-		
-		label.textProperty().bind(resistance.asString());
-		label.layoutXProperty().bind(label.widthProperty().divide(2));
+
+		setName("Capacitor"+Circuit.elementIDs.get(this.getID()));
+
+		Line line1=new Line(0, 0, 0, 40);
+		line1.setStrokeWidth(4);
+		Line line2=new Line(10, 0, 10, 40);
+		line2.setStrokeWidth(4);
+
+
+		label.textProperty().bind(capacitance.asString());
 		label.setTextFill(Color.WHITE);
-		
-		rectangle.setFill(null);
-		rectangle.setStrokeWidth(4);
-		rectangle.setStroke(Color.BLACK);
-		
+
 		wires=new ArrayList<Line>(2);
-		wires.add(0, new Line(0, rectangle.getHeight()/2, -20, rectangle.getHeight()/2));
+		wires.add(0, new Line(0, 20, -20, 20));
 		wires.get(0).setStrokeWidth(4);
-		wires.add(1, new Line(rectangle.getWidth(), rectangle.getHeight()/2, rectangle.getWidth()+20, rectangle.getHeight()/2));
+		wires.add(1, new Line(line2.getStartX(), 20, line2.getStartX()+20, 20));
 		wires.get(1).setStrokeWidth(4);
-		
+
 		circles=new ArrayList<CircuitNode>(2);
 		for(int i=0; i<2; i++) {
 			circles.add(i, new CircuitNode(0, 0, 5));
@@ -51,7 +50,8 @@ public class Resistor extends Element{
 			circles.get(i).layoutYProperty().bind(wires.get(i).endYProperty());
 			circles.get(i).setFill(Color.ALICEBLUE);
 		}
-		group.getChildren().addAll(wires.get(0), wires.get(1), rectangle, label, circles.get(0), circles.get(1));
+
+		group.getChildren().addAll(wires.get(0), wires.get(1), line1, line2, label, circles.get(0), circles.get(1));
 		group.setOnMouseClicked(me->{
 			if(me.getButton().equals(MouseButton.PRIMARY)) {//左クリックされた場合
 				if(me.getClickCount()==2) {//ダブルクリックされた場合
@@ -67,24 +67,20 @@ public class Resistor extends Element{
 		setDraggable();
 	}
 
-	public void setResistance(double resistance) {
-		this.resistance.set(resistance);
-	}
-
 	@Override
-	public void editValue() {
+	protected void editValue() {
 		//新しいウィンドウの生成
 		Stage stage=new Stage();
 		stage.initOwner(Main.stage);
 		stage.initModality(Modality.APPLICATION_MODAL);//閉じるまで他の操作を禁止
-		stage.setTitle("抵抗を入力してね");
+		stage.setTitle("キャパシタンスを入力してね");
 		stage.setResizable(false);
 		VBox pane=new VBox();
 		pane.setAlignment(Pos.CENTER);
 		Scene scene=new Scene(pane, 400, 300);
 		//https://stackoverflow.com/questions/7555564/what-is-the-recommended-way-to-make-a-numeric-textfield-in-javafx
 		TextField form=new TextField();
-		form.setText(String.valueOf(resistance.get()));
+		form.setText(String.valueOf(capacitance.get()));
 		form.textProperty().addListener((o, old,newly) ->{
 			String s="";
 			for(char c : newly.toCharArray()){
@@ -98,7 +94,7 @@ public class Resistor extends Element{
 		button.setText("OK");
 		button.setOnMouseClicked(event->{
 			try {
-				resistance.set(Double.parseDouble(form.getText()));
+				capacitance.set(Double.parseDouble(form.getText()));
 				stage.close();
 			}catch(NumberFormatException e) {
 				Alert al=new Alert(AlertType.ERROR);
@@ -114,6 +110,8 @@ public class Resistor extends Element{
 
 	@Override
 	public Complex getImpedance() {
-		return new Complex(resistance.get(), 0.0);
+		// TODO 自動生成されたメソッド・スタブ
+		return null;
 	}
+
 }

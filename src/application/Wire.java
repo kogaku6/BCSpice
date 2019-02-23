@@ -8,11 +8,7 @@ import javafx.scene.input.MouseDragEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
-public class Wire extends Element{	
-	Wire(){
-		this(50, 0);
-	}
-
+public class Wire extends Element{
 	Wire(double X, double Y){
 		setX(X);
 		setY(Y);
@@ -21,10 +17,12 @@ public class Wire extends Element{
 		circles=new ArrayList<CircuitNode>(2);
 		circles.add(0,new CircuitNode(0, 0, 5));
 		circles.get(0).setFill(Color.ALICEBLUE);
+		circles.get(0).setLayoutX(0);
+		circles.get(0).setLayoutY(0);
 		circles.add(1, new CircuitNode(0, 0, 5));
 		circles.get(1).setFill(Color.ALICEBLUE);
-		circles.get(1).setLayoutX(X);
-		circles.get(1).setLayoutX(Y);
+		circles.get(1).setLayoutX(200);
+		circles.get(1).setLayoutY(0);
 		circles.forEach(a->{
 			a.setOnMouseEntered(e->{
 				a.setFill(Color.INDIANRED);

@@ -1,6 +1,7 @@
 package application;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -14,36 +15,52 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Arc;
+import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class Resistor extends Element{
-	private DoubleProperty resistance=new SimpleDoubleProperty(30.0);
-	private Rectangle rectangle=new Rectangle(0,0,100,30);
+public class Inductor extends Element{
+	private DoubleProperty inductance=new SimpleDoubleProperty(0.005);
 	private Label label=new Label();
 
-	Resistor(double X, double Y){
+	Inductor(double X, double Y){
 		setX(X);
 		setY(Y);
-		
-		setName("Resistor");
-		
-		label.textProperty().bind(resistance.asString());
-		label.layoutXProperty().bind(label.widthProperty().divide(2));
+
+		setName("Inductor"+Circuit.elementIDs.get(this.getID()));
+
+		label.textProperty().bind(inductance.asString());
 		label.setTextFill(Color.WHITE);
-		
-		rectangle.setFill(null);
-		rectangle.setStrokeWidth(4);
-		rectangle.setStroke(Color.BLACK);
-		
+
+		//http://www.osaka-kyoiku.ac.jp/~fuji/lecture/keijis/lesson06.html
+
+		List<Arc> arcs=new ArrayList<Arc>(4);
+		for(int i=0; i<4; i++) {
+			Arc arc=null;
+			if(i==0) {
+				arc=new Arc(0, 0, 20, 20, -45, 225);
+			}
+			else if(i==3) {
+				arc=new Arc(81, 0, 20, 20, 0, 225);
+			}
+			else {
+				arc=new Arc(27*i, 0, 20, 20, -45, 270);
+			}
+			arc.setFill(null);
+			arc.setStrokeWidth(4);
+			arc.setStroke(Color.BLACK);
+			arc.setType(ArcType.OPEN);
+			arcs.add(arc);
+		}
+
 		wires=new ArrayList<Line>(2);
-		wires.add(0, new Line(0, rectangle.getHeight()/2, -20, rectangle.getHeight()/2));
+		wires.add(0, new Line(-20, arcs.get(0).getCenterY(), -40, arcs.get(0).getCenterY()));
 		wires.get(0).setStrokeWidth(4);
-		wires.add(1, new Line(rectangle.getWidth(), rectangle.getHeight()/2, rectangle.getWidth()+20, rectangle.getHeight()/2));
+		wires.add(1, new Line(arcs.get(3).getCenterX()+20, arcs.get(3).getCenterY(), arcs.get(3).getCenterX()+40, arcs.get(3).getCenterY()));
 		wires.get(1).setStrokeWidth(4);
-		
+
 		circles=new ArrayList<CircuitNode>(2);
 		for(int i=0; i<2; i++) {
 			circles.add(i, new CircuitNode(0, 0, 5));
@@ -51,7 +68,10 @@ public class Resistor extends Element{
 			circles.get(i).layoutYProperty().bind(wires.get(i).endYProperty());
 			circles.get(i).setFill(Color.ALICEBLUE);
 		}
-		group.getChildren().addAll(wires.get(0), wires.get(1), rectangle, label, circles.get(0), circles.get(1));
+
+		group.getChildren().addAll(wires.get(0), wires.get(1));
+		arcs.forEach(a->group.getChildren().add(a));
+		group.getChildren().addAll(label, circles.get(0), circles.get(1));
 		group.setOnMouseClicked(me->{
 			if(me.getButton().equals(MouseButton.PRIMARY)) {//左クリックされた場合
 				if(me.getClickCount()==2) {//ダブルクリックされた場合
@@ -67,24 +87,20 @@ public class Resistor extends Element{
 		setDraggable();
 	}
 
-	public void setResistance(double resistance) {
-		this.resistance.set(resistance);
-	}
-
 	@Override
-	public void editValue() {
+	protected void editValue() {
 		//新しいウィンドウの生成
 		Stage stage=new Stage();
 		stage.initOwner(Main.stage);
 		stage.initModality(Modality.APPLICATION_MODAL);//閉じるまで他の操作を禁止
-		stage.setTitle("抵抗を入力してね");
+		stage.setTitle("インダクタンスを入力してね");
 		stage.setResizable(false);
 		VBox pane=new VBox();
 		pane.setAlignment(Pos.CENTER);
 		Scene scene=new Scene(pane, 400, 300);
 		//https://stackoverflow.com/questions/7555564/what-is-the-recommended-way-to-make-a-numeric-textfield-in-javafx
 		TextField form=new TextField();
-		form.setText(String.valueOf(resistance.get()));
+		form.setText(String.valueOf(inductance.get()));
 		form.textProperty().addListener((o, old,newly) ->{
 			String s="";
 			for(char c : newly.toCharArray()){
@@ -98,7 +114,7 @@ public class Resistor extends Element{
 		button.setText("OK");
 		button.setOnMouseClicked(event->{
 			try {
-				resistance.set(Double.parseDouble(form.getText()));
+				inductance.set(Double.parseDouble(form.getText()));
 				stage.close();
 			}catch(NumberFormatException e) {
 				Alert al=new Alert(AlertType.ERROR);
@@ -114,6 +130,7 @@ public class Resistor extends Element{
 
 	@Override
 	public Complex getImpedance() {
-		return new Complex(resistance.get(), 0.0);
+		return null;
 	}
+
 }
