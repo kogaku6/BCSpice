@@ -10,18 +10,26 @@ import java.util.ResourceBundle;
 import javax.imageio.ImageIO;
 
 import javafx.application.Application;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -199,20 +207,74 @@ public class TitleController extends Application implements Initializable{
 		Stage stage=new Stage();
 		stage.initOwner(Main.stage);
 		stage.initModality(Modality.APPLICATION_MODAL);//閉じるまで他の操作を禁止
-		stage.setTitle("るんげ");
-		stage.setResizable(false);
+		stage.setTitle("ぐらふ");
+		stage.setResizable(true);
 		VBox pane=new VBox();
 		pane.setAlignment(Pos.CENTER);
+
 		Scene scene=new Scene(pane, 400, 300);
+
+		NumberAxis xAxis=new NumberAxis();
+		NumberAxis yAxis=new NumberAxis();
+		LineChart<Number, Number> chart=new LineChart<>(xAxis,yAxis);
+//		chart.setLegendVisible(false);
+		chart.setAnimated(false);
+		xAxis.setLabel("time");
+		yAxis.setLabel("current");
+		XYChart.Series<Number, Number> series=new Series<Number,Number>();
+		XYChart.Series<Number, Number> bibun=new Series<Number, Number>();
+		series.setName("normal");
+		bibun.setName("differential");
+
+		DoubleProperty resolution=new SimpleDoubleProperty(0.01);
+		TextField resolutionForm=new TextField();
+		resolutionForm.setPromptText("set a resolution time");
+		resolutionForm.setText(String.valueOf(resolution.get()));
+		resolutionForm.textProperty().addListener((o, old,newly) ->{
+			if(resolutionForm.getLength()>0) {
+				String s="";
+				for(char c : newly.toCharArray()){
+					if(((int)c >= 48 && (int)c <= 57 || (int)c == 46)){
+						s+=c;
+					}
+				}
+				resolution.set(Double.parseDouble(s));
+				resolutionForm.setText(resolution.getValue().toString());
+			}
+		});
+		DoubleProperty finishTime=new SimpleDoubleProperty(1.0);
+		TextField finishForm=new TextField();
+		finishForm.setPromptText("set a finishtime");
+		finishForm.setText(String.valueOf(finishTime.get()));
+		finishForm.textProperty().addListener((o, old,newly) ->{
+			if(finishForm.getLength()>0) {
+				String s="";
+				for(char c : newly.toCharArray()){
+					if(((int)c >= 48 && (int)c <= 57 || (int)c == 46)){
+						s+=c;
+					}
+				}
+				finishTime.set(Double.parseDouble(s));
+				finishForm.setText(finishTime.getValue().toString());
+			}
+		});
 
 		Button button=new Button();
 		button.setText("OK");
 		button.setOnMouseClicked(event->{//ボタンクリック時のイベント
-			for(int i=0; i<Circuit.nodeIDs.size(); i++) {
-				System.out.println(Circuit.nodeIDs.get(i).getID()+":"+Circuit.nodeIDs.get(i).getElementtype());
+			chart.getData().clear();
+			List<Series<Number, Number>> list=new ArrayList<Series<Number, Number>>();
+			Current denryu=new Current(Current.ALTERNATIVE);
+			for(double i=0.0; i<finishTime.get(); i+=resolution.get()) {
+				series.getData().add(new Data<Number, Number>(i, denryu.getValue(i)));
+				double dy=denryu.getValue(i+resolution.get())-denryu.getValue(i);
+				bibun.getData().add(new Data<Number, Number>(i, dy/resolution.get()));
 			}
+			list.add(series);
+			list.add(bibun);
+			chart.getData().addAll(list);//グラフの生成
 		});
-		pane.getChildren().addAll(button);
+		pane.getChildren().addAll(resolutionForm, finishForm, button, chart);
 		stage.setScene(scene);
 		stage.sizeToScene();
 		stage.showAndWait();
