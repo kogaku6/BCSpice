@@ -20,7 +20,6 @@ import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Button;
@@ -221,11 +220,13 @@ public class TitleController extends Application implements Initializable{
 		chart.setAnimated(false);
 		xAxis.setLabel("time");
 		yAxis.setLabel("current");
-		XYChart.Series<Number, Number> series=new Series<Number,Number>();
-		XYChart.Series<Number, Number> bibun=new Series<Number, Number>();
+		Series<Number, Number> series=new Series<Number, Number>();
+		Series<Number, Number> bibun=new Series<Number, Number>();
+		Series<Number, Number> sekibun=new Series<Number, Number>();
 		series.setName("normal");
 		bibun.setName("differential");
-
+		sekibun.setName("integral");
+		
 		DoubleProperty resolution=new SimpleDoubleProperty(0.01);
 		TextField resolutionForm=new TextField();
 		resolutionForm.setPromptText("set a resolution time");
@@ -265,13 +266,24 @@ public class TitleController extends Application implements Initializable{
 			chart.getData().clear();
 			List<Series<Number, Number>> list=new ArrayList<Series<Number, Number>>();
 			Current denryu=new Current(Current.ALTERNATIVE);
-			for(double i=0.0; i<finishTime.get(); i+=resolution.get()) {
+			double dx=resolution.get();
+			int num=0;
+			for(double i=0.0; i<finishTime.get(); i+=dx) {
 				series.getData().add(new Data<Number, Number>(i, denryu.getValue(i)));
-				double dy=denryu.getValue(i+resolution.get())-denryu.getValue(i);
-				bibun.getData().add(new Data<Number, Number>(i, dy/resolution.get()));
+				double dy=denryu.getValue(i+dx)-denryu.getValue(i);
+				bibun.getData().add(new Data<Number, Number>(i, dy/dx));
+				if(num>0) {
+					double d=(double)sekibun.getData().get(num-1).getYValue();
+					sekibun.getData().add(new Data<Number, Number>(i, d+(denryu.getValue(i)+denryu.getValue(i+dx))*dx/2));
+				}
+				else {
+					sekibun.getData().add(new Data<Number, Number>(0.0, 0.0));
+				}
+				num++;
 			}
 			list.add(series);
 			list.add(bibun);
+			list.add(sekibun);
 			chart.getData().addAll(list);//グラフの生成
 		});
 		pane.getChildren().addAll(resolutionForm, finishForm, button, chart);

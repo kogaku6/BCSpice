@@ -5,8 +5,8 @@ public class Current {
 	public final static int ALTERNATIVE=1;
 
 	private int currentType=DIRECT;
-	private double maxValue=2.0;
-	private double frequency=20;
+	private double maxValue=5.0;
+	private double frequency=2;
 
 	Current(int currentType){
 		this.currentType=currentType;
@@ -20,6 +20,7 @@ public class Current {
 				break;
 			case 1:
 				value=maxValue*Math.sin(frequency*time);
+				break;
 		}
 		return value;
 	}
