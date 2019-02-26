@@ -10,25 +10,15 @@ import java.util.ResourceBundle;
 import javax.imageio.ImageIO;
 
 import javafx.application.Application;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Scene;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart.Data;
-import javafx.scene.chart.XYChart.Series;
-import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -37,10 +27,8 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -56,7 +44,7 @@ public class TitleController extends Application implements Initializable{
 	@FXML
 	MenuBar mb;
 	@FXML
-	MenuItem importItem, exportItem, closeItem, runItem, specialItem;
+	MenuItem importItem, exportItem, closeItem, runItem, stopItem, specialItem;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -120,7 +108,6 @@ public class TitleController extends Application implements Initializable{
 		});
 		top.setOnMouseClicked(e->{
 			contextMenu.hide();
-			Circuit.isSimulating=false;
 			ap.setCursor(Cursor.DEFAULT);
 			if(e.getButton().equals(MouseButton.SECONDARY)) {
 				contextMenu.show(ap, e.getScreenX(), e.getScreenY());
@@ -201,95 +188,16 @@ public class TitleController extends Application implements Initializable{
 
 
 //		ap.setCursor(new ImageCursor(readImage("resources/icon.png")));
-//		Circuit.isSimulating=true;
-		//テスト用ウィンドウの生成
-		Stage stage=new Stage();
-		stage.initOwner(Main.stage);
-		stage.initModality(Modality.APPLICATION_MODAL);//閉じるまで他の操作を禁止
-		stage.setTitle("ぐらふ");
-		stage.setResizable(true);
-		VBox pane=new VBox();
-		pane.setAlignment(Pos.CENTER);
-
-		Scene scene=new Scene(pane, 400, 300);
-
-		NumberAxis xAxis=new NumberAxis();
-		NumberAxis yAxis=new NumberAxis();
-		LineChart<Number, Number> chart=new LineChart<>(xAxis,yAxis);
-//		chart.setLegendVisible(false);
-		chart.setAnimated(false);
-		xAxis.setLabel("time");
-		yAxis.setLabel("current");
-		Series<Number, Number> series=new Series<Number, Number>();
-		Series<Number, Number> bibun=new Series<Number, Number>();
-		Series<Number, Number> sekibun=new Series<Number, Number>();
-		series.setName("normal");
-		bibun.setName("differential");
-		sekibun.setName("integral");
-		
-		DoubleProperty resolution=new SimpleDoubleProperty(0.01);
-		TextField resolutionForm=new TextField();
-		resolutionForm.setPromptText("set a resolution time");
-		resolutionForm.setText(String.valueOf(resolution.get()));
-		resolutionForm.textProperty().addListener((o, old,newly) ->{
-			if(resolutionForm.getLength()>0) {
-				String s="";
-				for(char c : newly.toCharArray()){
-					if(((int)c >= 48 && (int)c <= 57 || (int)c == 46)){
-						s+=c;
-					}
-				}
-				resolution.set(Double.parseDouble(s));
-				resolutionForm.setText(resolution.getValue().toString());
-			}
-		});
-		DoubleProperty finishTime=new SimpleDoubleProperty(1.0);
-		TextField finishForm=new TextField();
-		finishForm.setPromptText("set a finishtime");
-		finishForm.setText(String.valueOf(finishTime.get()));
-		finishForm.textProperty().addListener((o, old,newly) ->{
-			if(finishForm.getLength()>0) {
-				String s="";
-				for(char c : newly.toCharArray()){
-					if(((int)c >= 48 && (int)c <= 57 || (int)c == 46)){
-						s+=c;
-					}
-				}
-				finishTime.set(Double.parseDouble(s));
-				finishForm.setText(finishTime.getValue().toString());
-			}
-		});
-
-		Button button=new Button();
-		button.setText("OK");
-		button.setOnMouseClicked(event->{//ボタンクリック時のイベント
-			chart.getData().clear();
-			List<Series<Number, Number>> list=new ArrayList<Series<Number, Number>>();
-			Current denryu=new Current(Current.ALTERNATIVE);
-			double dx=resolution.get();
-			int num=0;
-			for(double i=0.0; i<finishTime.get(); i+=dx) {
-				series.getData().add(new Data<Number, Number>(i, denryu.getValue(i)));
-				double dy=denryu.getValue(i+dx)-denryu.getValue(i);
-				bibun.getData().add(new Data<Number, Number>(i, dy/dx));
-				if(num>0) {
-					double d=(double)sekibun.getData().get(num-1).getYValue();
-					sekibun.getData().add(new Data<Number, Number>(i, d+(denryu.getValue(i)+denryu.getValue(i+dx))*dx/2));
-				}
-				else {
-					sekibun.getData().add(new Data<Number, Number>(0.0, 0.0));
-				}
-				num++;
-			}
-			list.add(series);
-			list.add(bibun);
-			list.add(sekibun);
-			chart.getData().addAll(list);//グラフの生成
-		});
-		pane.getChildren().addAll(resolutionForm, finishForm, button, chart);
-		stage.setScene(scene);
-		stage.sizeToScene();
-		stage.showAndWait();
+		Circuit.isSimulating=true;
+		runItem.setDisable(true);
+		stopItem.setDisable(false);
+	}
+	
+	@FXML
+	private void stopSimulate() {
+		Circuit.isSimulating=false;
+		runItem.setDisable(false);
+		stopItem.setDisable(true);
 	}
 
 	//ワイヤーの見た目を変えるクラス

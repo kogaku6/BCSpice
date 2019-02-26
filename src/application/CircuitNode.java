@@ -1,17 +1,18 @@
 package application;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.scene.shape.Circle;
 
 public class CircuitNode extends Circle{//接点クラス
 	private Integer ID=null;//節点のID
 	private Integer elementID=null;
+	private Integer nodalID=null;
 	//private double current=0;//節点電流
 	//private double voltage=0;//節点電圧
 	private Integer intersectNode=null;
-	private List<Element> elements=new ArrayList<Element>();//節点につながっている素子のIDのリスト
+	private Map<Integer, Element> elements=new HashMap<Integer, Element>();//節点につながっている素子のIDのリスト
 	private String elementtype=null;
 
 	//http://www.ecircuitcenter.com/SpiceTopics/Overview/Overview.htm
@@ -30,18 +31,30 @@ public class CircuitNode extends Circle{//接点クラス
 	}
 
 	//節点に素子をつなげる
-	public void add(Element element) {
-		elements.add(element.getID(), element);
+	public void add(CircuitNode node) {
+		Element element=Circuit.elementIDs.get(node.getElementID());
+		elements.put(element.getID(), element);
+		setIntersectNode(node.getID());
 	}
 
 	//節点につながっている素子を返す
-	public Element get(int num) {
-		return elements.get(num);
+	public Element getElement(int num) {
+		if(elements.size()>num) {
+			return elements.get(num);
+		}
+		else {
+			return null;
+		}
 	}
 
 	//節点から素子を取り除く
 	public void remove(Integer ID) {
-		elements.remove(ID.intValue());
+//		if(elements.size()>ID) {
+			if(elements.get(ID)!=null) {
+				elements.remove(ID.intValue());
+				setIntersectNode(null);
+			}
+//		}
 	}
 
 	//TODO 接点に印加される電流を計算
@@ -90,15 +103,25 @@ public class CircuitNode extends Circle{//接点クラス
 
 	public void setIntersectNode(Integer intersectNode) {
 		this.intersectNode = intersectNode;
-		if(intersectNode!=null) {
-			CircuitNode node=Circuit.nodeIDs.get(intersectNode);
-			double x1=Circuit.elementIDs.get(node.getElementID()).getGroup().getLayoutX();
-			double y1=Circuit.elementIDs.get(node.getElementID()).getGroup().getLayoutY();
-			double x2=Circuit.elementIDs.get(this.getElementID()).getGroup().getLayoutX();
-			double y2=Circuit.elementIDs.get(this.getElementID()).getGroup().getLayoutY();
-			this.setLayoutX(x1-x2+node.getLayoutX());
-			this.setLayoutY(y1-y2+node.getLayoutY());
-		}
+//		if(elementtype=="Wire") {
+			if(intersectNode!=null) {
+				CircuitNode node=Circuit.nodeIDs.get(intersectNode);
+				double x1=Circuit.elementIDs.get(node.getElementID()).getGroup().getLayoutX();
+				double y1=Circuit.elementIDs.get(node.getElementID()).getGroup().getLayoutY();
+				double x2=Circuit.elementIDs.get(this.getElementID()).getGroup().getLayoutX();
+				double y2=Circuit.elementIDs.get(this.getElementID()).getGroup().getLayoutY();
+				this.layoutXProperty().set(x1-x2+node.getLayoutX());
+				this.layoutYProperty().set(y1-y2+node.getLayoutY());
+			}
+//		}
+	}
+
+	public Integer getNodalID() {
+		return nodalID;
+	}
+
+	public void setNodalID(Integer nodalID) {
+		this.nodalID = nodalID;
 	}
 
 

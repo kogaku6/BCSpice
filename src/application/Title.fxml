@@ -39,6 +39,7 @@
             <Menu mnemonicParsing="false" text="Simulate">
               <items>
                 <MenuItem fx:id="runItem" mnemonicParsing="false" onAction="#startSimulate" text="Run" />
+                  <MenuItem fx:id="stopItem" disable="true" mnemonicParsing="false" onAction="#stopSimulate" text="Stop" />
               </items>
             </Menu>
             <Menu mnemonicParsing="false" text="Options">

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javafx.scene.Cursor;
 import javafx.scene.effect.Glow;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -16,14 +17,17 @@ public class Wire extends Element{
 
 		circles=new ArrayList<CircuitNode>(2);
 		circles.add(0,new CircuitNode(0, 0, 5));
+		circles.get(0).setNodalID(0);
 		circles.get(0).setFill(Color.ALICEBLUE);
 		circles.get(0).setLayoutX(0);
 		circles.get(0).setLayoutY(0);
 		circles.add(1, new CircuitNode(0, 0, 5));
+		circles.get(1).setNodalID(1);
 		circles.get(1).setFill(Color.ALICEBLUE);
 		circles.get(1).setLayoutX(200);
 		circles.get(1).setLayoutY(0);
 		circles.forEach(a->{
+			a.setElementID(getID());
 			a.setOnMouseEntered(e->{
 				a.setFill(Color.INDIANRED);
 				Glow glow=new Glow();
@@ -58,6 +62,11 @@ public class Wire extends Element{
 		wires.add(line);
 
 		group.getChildren().addAll(wires.get(0), circles.get(0), circles.get(1));
+		group.setOnMouseClicked(e->{
+			if(e.getButton().equals(MouseButton.SECONDARY)) {
+				e.consume();
+			}
+		});
 		setDraggable();
 	}
 

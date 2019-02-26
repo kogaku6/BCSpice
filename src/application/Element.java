@@ -1,19 +1,18 @@
 package application;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.effect.Glow;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.shape.Line;
 
 public abstract class Element {//素子クラス
 	private Integer ID=null;
 	private String name=null;
-	private List<Integer> nodes=new ArrayList<Integer>();
 	protected double offsetX=0.0;
 	protected double offsetY=0.0;
 	protected Group group=new Group();
@@ -24,7 +23,7 @@ public abstract class Element {//素子クラス
 	}
 
 	public boolean isConnected(int num) {
-		if(nodes.get(num)!=null) {
+		if(circles.get(num)!=null) {
 			System.out.println("つながってるよ");
 			return true;
 		}
@@ -51,13 +50,17 @@ public abstract class Element {//素子クラス
 				Main.root.setCursor(Cursor.DEFAULT);
 			});
 			a.setOnMousePressed(e->{
-				offsetX=e.getX();
-				offsetY=e.getY();
+				if(e.getButton().equals(MouseButton.PRIMARY)) {
+					offsetX=e.getX();
+					offsetY=e.getY();
+				}
 			});
 			a.addEventHandler(MouseDragEvent.MOUSE_DRAGGED, e->{
-				group.layoutXProperty().set(e.getSceneX()-offsetX);
-				group.layoutYProperty().set(e.getSceneY()-offsetY);
-//				e.consume();
+				if(e.getButton().equals(MouseButton.PRIMARY)) {
+					group.layoutXProperty().set(e.getSceneX()-offsetX);
+					group.layoutYProperty().set(e.getSceneY()-offsetY);
+	//				e.consume();
+				}
 			});
 		});
 		circles.forEach(a->Circuit.addNode(a, this));

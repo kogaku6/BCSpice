@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class Circuit {
 	public static Map<Integer, CircuitNode> nodeIDs=new HashMap<Integer, CircuitNode>();
@@ -73,31 +74,35 @@ public class Circuit {
 	}
 
 	//接点が重なっているか判定
-	public static void isIntersectNodes(int ID) {
-
+	public static void isIntersectNodes(Integer ID) {
 		CircuitNode node1=nodeIDs.get(ID);
-		for(int i=0; i<nodeIDs.size(); i++) {
-			if(ID!=i) {
-				CircuitNode node2=nodeIDs.get(i);
 
+		for (Entry<Integer, CircuitNode> entry : nodeIDs.entrySet()) {
+			if(ID!=entry.getKey()) {
+				CircuitNode node2=entry.getValue();
 				double x1=elementIDs.get(node1.getElementID()).getGroup().getLayoutX()+node1.getLayoutX();
 				double y1=elementIDs.get(node1.getElementID()).getGroup().getLayoutY()+node1.getLayoutY();
 				double x2=elementIDs.get(node2.getElementID()).getGroup().getLayoutX()+node2.getLayoutX();
 				double y2=elementIDs.get(node2.getElementID()).getGroup().getLayoutY()+node2.getLayoutY();
-
 				double distance=Math.sqrt(Math.pow(x1-x2, 2)+Math.pow(y1-y2, 2));
-//				System.out.println(ID+":"+node1.getLayoutX()+", "+node1.getLayoutY()+i+":"+node2.getLayoutX()+", "+node2.getLayoutY());
-//				System.out.println(ID+"と"+i+":"+distance);
+	//			System.out.println(ID+":"+node1.getLayoutX()+", "+node1.getLayoutY()+i+":"+node2.getLayoutX()+", "+node2.getLayoutY());
+	//			System.out.println(ID+"と"+i+":"+distance);
 				if(distance<20) {
-					System.out.println("node"+node2.getID()+"と重なっているよ");
-					node1.setIntersectNode(node2.getID());
+					if(node1.getIntersectNode()!=entry.getKey()) {
+						System.out.println(node1.getID()+"("+node1.getElementID()+")×"+node2.getID()+"("+node2.getElementID()+")");
+					}
+						node1.add(node2);
+						node2.add(node1);
 				}
 				else {
-					node1.setIntersectNode(null);
+					if(node1.getIntersectNode()==entry.getKey()) {
+						System.out.println(node1.getID()+"("+node1.getElementID()+")_"+node2.getID()+"("+node2.getElementID()+")");
+					}
+						node1.remove(node2.getID());
+						node2.remove(node1.getID());
 				}
 			}
 		}
-
 	}
 
 	//keyとElementを設定
@@ -113,21 +118,32 @@ public class Circuit {
 	}
 
 	//使う予定なし
-	public static boolean isCirculation(Integer id) {
-//		System.out.println("今の素子idは"+elementIDs.get(id).getID());
-//		System.out.println("次の素子idは"+elementIDs.get(id).getNextIDs());
-//
-//		if(elementIDs.get(id).getNextIDs().size()>0) {
-//			if(elementIDs.get(id).getNextIDs()==id) {
-//				return true;
-//			}
-//			else {
-//				return Circuit.isCirculation(id);
-//			}
-//		}
-//		else {
-//			return false;
-//		}
-		return false;
+	public static boolean isCirculation(Integer elementID, Integer nodeID) {
+		System.out.println("判定かいすぃ");
+		for (Entry<Integer, CircuitNode> entry : nodeIDs.entrySet()) {
+			System.out.println(entry.getKey()+"×"+entry.getValue().getIntersectNode());
+		}
+		CircuitNode node1=nodeIDs.get(nodeID);//nodeIDのnode
+		Element el1=elementIDs.get(node1.getElementID());
+		System.out.println("元の素子IDは"+elementID);
+		System.out.println("今の素子IDは"+el1.getID()+", 今のnodeIDは"+node1.getID());
+		if(node1.getIntersectNode()!=null) {
+			CircuitNode node2=nodeIDs.get(node1.getIntersectNode());//node1と重なっているnode
+			Element el2=elementIDs.get(node2.getElementID());
+			if(el2.getID()==elementID) {
+				System.out.println("かいろだよ!!!!!");
+				return true;
+			}
+			else {
+				CircuitNode node3=nodeIDs.get(el2.circles.get((node2.getNodalID()+1)%2).getID());//node2の反対側のnode
+				System.out.println("次の素子IDは"+el2.getID()+", 次のnodeIDは"+node3.getID());
+				return Circuit.isCirculation(elementID, node3.getID());
+			}
+		}
+		else {
+			System.out.println("次の素子はないよ");
+			System.out.println("かいろじゃないよ");
+			return false;
+		}
 	}
 }

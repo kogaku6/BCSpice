@@ -2,8 +2,6 @@ package application;
 
 import java.util.ArrayList;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -19,9 +17,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class Voltage extends Element{
-	//0:DC 1:AC
-	private int waveType=0;
-	private DoubleProperty voltage=new SimpleDoubleProperty(5.0);
+	public final static int DIRECT=0;
+	public final static int ALTERNATIVE=1;
+
+	private int currentType=DIRECT;
+	private Double maxValue=5.0;
+	private double frequency=2;
 	private Label label=new Label();
 
 	Voltage(){
@@ -40,7 +41,7 @@ public class Voltage extends Element{
 		Line line2=new Line(10, 5, 10, 30);
 		line2.setStrokeWidth(4);
 		
-		label.textProperty().bind(voltage.asString());
+		label.setText(maxValue.toString());
 		label.setTextFill(Color.WHITE);
 		
 		wires=new ArrayList<Line>(2);
@@ -86,7 +87,7 @@ public class Voltage extends Element{
 		Scene scene=new Scene(pane, 400, 300);
 		//https://stackoverflow.com/questions/7555564/what-is-the-recommended-way-to-make-a-numeric-textfield-in-javafx
 		TextField form=new TextField();
-		form.setText(String.valueOf(voltage.get()));
+		form.setText(String.valueOf(maxValue));
 		form.textProperty().addListener((o, old,newly) ->{
 			String s="";
 			for(char c : newly.toCharArray()){
@@ -100,7 +101,7 @@ public class Voltage extends Element{
 		button.setText("OK");
 		button.setOnMouseClicked(event->{
 			try {
-				voltage.set(Double.parseDouble(form.getText()));
+				maxValue=Double.parseDouble(form.getText());
 				stage.close();
 			}catch(NumberFormatException e) {
 				Alert al=new Alert(AlertType.ERROR);
@@ -114,12 +115,17 @@ public class Voltage extends Element{
 		stage.showAndWait();
 	}
 
-	public int getVoltageType() {
-		return waveType;
-	}
-
-	public void setVoltageType(int voltageType) {
-		this.waveType = voltageType;
+	public double getValue(double time) {
+		Double value=null;
+		switch(currentType) {
+			case 0:
+				value=maxValue;
+				break;
+			case 1:
+				value=maxValue*Math.sin(frequency*time);
+				break;
+		}
+		return value;
 	}
 
 	@Override

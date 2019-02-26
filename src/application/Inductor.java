@@ -7,6 +7,10 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart.Data;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -24,6 +28,8 @@ import javafx.stage.Stage;
 public class Inductor extends Element{
 	private DoubleProperty inductance=new SimpleDoubleProperty(0.005);
 	private Label label=new Label();
+
+	private Current current=new Current(0.0, 0.0, Current.DIRECT);
 
 	Inductor(double X, double Y){
 		setX(X);
@@ -56,17 +62,25 @@ public class Inductor extends Element{
 		}
 
 		wires=new ArrayList<Line>(2);
-		wires.add(0, new Line(-20, arcs.get(0).getCenterY(), -40, arcs.get(0).getCenterY()));
+		wires.add(0, new Line(-20, arcs.get(0).getCenterY(), 0, 0));
 		wires.get(0).setStrokeWidth(4);
-		wires.add(1, new Line(arcs.get(3).getCenterX()+20, arcs.get(3).getCenterY(), arcs.get(3).getCenterX()+40, arcs.get(3).getCenterY()));
+		wires.add(1, new Line(arcs.get(3).getCenterX()+20, arcs.get(3).getCenterY(), 0, 0));
 		wires.get(1).setStrokeWidth(4);
 
 		circles=new ArrayList<CircuitNode>(2);
 		for(int i=0; i<2; i++) {
-			circles.add(i, new CircuitNode(0, 0, 5));
-			circles.get(i).layoutXProperty().bind(wires.get(i).endXProperty());
-			circles.get(i).layoutYProperty().bind(wires.get(i).endYProperty());
-			circles.get(i).setFill(Color.ALICEBLUE);
+			CircuitNode node=new CircuitNode(0, 0, 5);
+			if(i==0) {
+				node.setLayoutX(-40);
+			}
+			else {
+				node.setLayoutX(arcs.get(3).getCenterX()+40);
+			}
+			node.setLayoutY(arcs.get(3).getCenterY());
+			node.setFill(Color.ALICEBLUE);
+			wires.get(i).endXProperty().bind(node.layoutXProperty());
+			wires.get(i).endYProperty().bind(node.layoutYProperty());
+			circles.add(i, node);
 		}
 
 		group.getChildren().addAll(wires.get(0), wires.get(1));
@@ -80,8 +94,90 @@ public class Inductor extends Element{
 				}
 			}
 			else if(me.getButton().equals(MouseButton.SECONDARY)) {//右クリックされた場合
-				me.consume();
-				editValue();
+				if(Circuit.isSimulating) {//シミュレーション実行中である場合
+					me.consume();
+					if(Circuit.isCirculation(getID(), 0)) {
+						Stage stage=new Stage();
+						stage.initOwner(Main.stage);
+						stage.initModality(Modality.APPLICATION_MODAL);//閉じるまで他の操作を禁止
+						stage.setTitle("ぐらふ");
+						stage.setResizable(true);
+						VBox pane=new VBox();
+						pane.setAlignment(Pos.CENTER);
+
+						Scene scene=new Scene(pane, 400, 300);
+
+						NumberAxis xAxis=new NumberAxis();
+						NumberAxis yAxis=new NumberAxis();
+						LineChart<Number, Number> chart=new LineChart<>(xAxis,yAxis);
+	//					chart.setLegendVisible(false);
+						chart.setAnimated(false);
+						xAxis.setLabel("time");
+						yAxis.setLabel("voltage");
+						Series<Number, Number> bibun=new Series<Number, Number>();
+						bibun.setName("voltage");
+
+						DoubleProperty resolution=new SimpleDoubleProperty(0.01);
+						TextField resolutionForm=new TextField();
+						resolutionForm.setPromptText("set a resolution time");
+						resolutionForm.setText(String.valueOf(resolution.get()));
+						resolutionForm.textProperty().addListener((o, old,newly) ->{
+							if(resolutionForm.getLength()>0) {
+								String s="";
+								for(char c : newly.toCharArray()){
+									if(((int)c >= 48 && (int)c <= 57 || (int)c == 46)){
+										s+=c;
+									}
+								}
+								resolution.set(Double.parseDouble(s));
+								resolutionForm.setText(resolution.getValue().toString());
+							}
+						});
+						DoubleProperty finishTime=new SimpleDoubleProperty(1.0);
+						TextField finishForm=new TextField();
+						finishForm.setPromptText("set a finishtime");
+						finishForm.setText(String.valueOf(finishTime.get()));
+						finishForm.textProperty().addListener((o, old,newly) ->{
+							if(finishForm.getLength()>0) {
+								String s="";
+								for(char c : newly.toCharArray()){
+									if(((int)c >= 48 && (int)c <= 57 || (int)c == 46)){
+										s+=c;
+									}
+								}
+								finishTime.set(Double.parseDouble(s));
+								finishForm.setText(finishTime.getValue().toString());
+							}
+						});
+
+						Button button=new Button();
+						button.setText("OK");
+						button.setOnMouseClicked(event->{//ボタンクリック時のイベント
+	//						if(Circuit.groupIDs)
+							chart.getData().clear();
+							List<Series<Number, Number>> list=new ArrayList<Series<Number, Number>>();
+							current=new Current(5.0, 20.0, Current.ALTERNATIVE);
+							double dx=resolution.get();
+							for(double i=0.0; i<finishTime.get(); i+=dx) {
+								double dy=current.getValue(i+dx)-current.getValue(i);
+								bibun.getData().add(new Data<Number, Number>(i, inductance.get()*dy/dx));
+							}
+							list.add(bibun);
+							chart.getData().addAll(list);//グラフの生成
+						});
+						pane.getChildren().addAll(resolutionForm, finishForm, button, chart);
+						stage.setScene(scene);
+						stage.sizeToScene();
+						stage.showAndWait();
+					}
+					else {
+						System.out.println("回路じゃないっぽいからシミュレーションできないよ");
+					}
+				}
+				else {
+					me.consume();
+					editValue();
+				}
 			}
 		});
 		setDraggable();
